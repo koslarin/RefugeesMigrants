@@ -1,0 +1,17 @@
+Package: RefugeesMigrants
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Konstantin",
+           family = "Larin",
+           role = "aut",
+           email = "klarin21@amherst.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: It consists of a set of European migration deaths published by Guardian in 2018 (see https://github.com/ ondata/the-list and https://github.com/ondata/the-list/blob/master/data/refugeesAndMigrants.csv). The data were first published in a pdf format.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Depends: 
+    R (>= 2.10)
