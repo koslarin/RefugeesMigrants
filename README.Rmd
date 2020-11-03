@@ -1,0 +1,21 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# DiscGolf
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of RefugeesMigrants is to learn more about the deaths of refugees and migrants trying to come to Europe.
