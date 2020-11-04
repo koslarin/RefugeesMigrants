@@ -13,9 +13,91 @@ knitr::opts_chunk$set(
 )
 ```
 
-# DiscGolf
+# RefugeesMigrants
 
 <!-- badges: start -->
 <!-- badges: end -->
 
 The goal of RefugeesMigrants is to learn more about the deaths of refugees and migrants trying to come to Europe.
+
+```{r}
+data("RefugeesMigrants")
+library(tidyverse)
+sorted<- RefugeesMigrants %>% 
+  arrange(-number) %>%
+  select(date_found_dead, number,
+country_of_incident, cause_of_death)
+
+ knitr::kable(head(sorted, 10)) %>% 
+   kableExtra::column_spec(4, width = "4cm")
+```
+
+Some of rows list hundreds of deaths (up to `max(sorted$number)`) that stem from individual incidents, were the most deadly ones are caused by boats sinking in the Mediterranean Sea. This highlights the great danger of illegal travel by sea. A lot of people attempting to migrate or seek refuge in Europe have to resort to fragile and overcrowded ships in order to circumvent restricted and tightly patrolled land borders since they lack ability to travel by air.
+
+Based on the information wrangled from name_gender_age, close to half of the rows, close to half of the rows, `r round(1561/3932*100, 3)`%, mention men as at least some of the victims.  For children, including babies and teenagers, `r round(491/3932*100, 3)`% of rows mention at least 1 child to  have died, with a similar percentage of `r round(419/3932*100, 3)`% for women.
+
+However, a lot of of rows don't have any information in `name_gender_age` column on gender of the deceased, or only have partial information. As a result, the data in its current structure are unsuitable for calculating the # of the deceased by gender directly.
+
+From the summary, we know that years from 1993 to 2018 are represented with 511, or`r round(511/3932*100,3)`% of all observations, having years in different formats that don't work through basic date wrangling. The earliest known observation occured on January 1st, 1993, and the latest was on May 5th, 2018. As a result, any data for 2018 represents less than half of the calendar year. Although it is included in the visualization, the actual # for 2018 would be much higher.
+
+```{r message = FALSE, warning = FALSE}
+RefugeesMigrants <- RefugeesMigrants %>%
+  mutate(year = lubridate::year(date_found_dead))
+
+sum(RefugeesMigrants$number,na.rm=TRUE)
+
+RefugeesMigrants %>% 
+  ggplot(aes(x = year)) + 
+  geom_histogram(binwidth = 1, col = "white") +
+  scale_x_continuous(breaks = seq(1990, 2018, 5)) + 
+  xlab("Year of Death") +
+  ylab("Number of Rows") +
+  ggtitle("Histogram of the Number of Rows by Listed Year of Death")
+
+by_year <- RefugeesMigrants %>% 
+  select(year, number) %>% 
+  group_by(year) %>% 
+  summarise(total = sum(number, na.rm = TRUE))
+
+by_year %>% 
+  ggplot(aes(x = year, y = total)) + 
+  geom_col() +
+  scale_x_continuous(breaks = seq(1990, 2018, 5)) + 
+  xlab("Year of Death") +
+  ylab("Number of Deaths") +
+  ggtitle("Histogram of the Number of Deaths by Listed Year of Death")
+```
+
+In total, `r sum(RefugeesMigrants$number,na.rm=TRUE)` deaths are recorded in the dataset. 
+
+When looking at years by the number of rows listed, then 2017 and 2000 are the most represented, with over 250 rows each. The early years before 2000 have fewer rows than later data, with the eception of 2010 and 2013. Because the number of rows is not necessarily directly correlated to the number of deaths and events further in the past would be harder to notice and record, this does not say anything conclusive about the data.
+
+When looking at the total number of deaths for each year, where that information is available, years 2014-2017 are very clearly different, with over 2,500 deceased for each year. The difference over the years is clearer than with the previous plot: as the years go on, the number of deceased per year rises. However, there are exceptions to this trend for years 2010, 2012, and 2013. Further exploration of the data (and potentially oter similar datasets) would be required to understand whether this is caused by the missing year data, the dataset structure, or represents real world trends.
+
+```{r message = FALSE, warning = FALSE}
+
+by_country <- RefugeesMigrants %>% 
+  rename(`Country of Incident` = country_of_incident) %>%
+  select(`Country of Incident`, number) %>% 
+  group_by(`Country of Incident`) %>% 
+  summarise(Total = sum(number, na.rm = TRUE))
+
+knitr::kable(head(by_country[order(-by_country$Total),], 11))
+```
+
+For the country where deaths have occured, 14763, `r round(14763/sum(RefugeesMigrants$number,na.rm=TRUE)*100,3)`%, are not known. This represents both the limitations of the dataset's creation and the fact that deaths on sea, which are, as we saw in the table in a) often etremely deadly, often occur in international waters, and so get listed as "unknown."
+
+Among the known countries, both the African countries near the ocean/sea used as waypoints to Europe (e.g. Libya, Morocco) and the Southern European countries (e.g. Italy, Greece) are the countries with the greatest numbers of deaths, into hundreds and even thousands. 
+ 
+```{r message = FALSE, warning = FALSE}
+
+by_country <- RefugeesMigrants %>% 
+  rename(`Region of Origin` = region_of_origin) %>%
+  select(`Region of Origin`, number) %>% 
+  group_by(`Region of Origin`) %>% 
+  summarise(Total = sum(number, na.rm = TRUE))
+
+knitr::kable(head(by_country[order(-by_country$Total),], 10))
+```
+
+The data on the region of origin suffers from a lot of similar problems as the rest of the character variables in the dataset. Again, a large number, 11750 or `r round(11750/sum(RefugeesMigrants$number,na.rm=TRUE)*100,3)`%, come from origins that were not recorded in the data set. However, partially because many rows include different people from different areas, the most common regions of origin are either very generic such as "Sub-Saharan Africa" and "Africa" or are lists of several countries, like "Mali, Gambia, Sierra Leone". However, a lot of regions and countries included have at least one country separating them from Europe, indicating that a lot of migrant and refugees have to travel large distances, often in very unsafe conditions as in the case of Syrians during the civil war, in order to even attempt to reach relative safety in Europe. As we see from the table of deaths by the country of incident, even getting to Europe does not necessarily guarantee safety.
