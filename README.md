@@ -5,6 +5,7 @@
 
 <!-- badges: start -->
 
+![R-CMD-check](https://github.com/koslarin/RefugeesMigrants/workflows/R-CMD-check/badge.svg)
 <!-- badges: end -->
 
 The goal of RefugeesMigrants is to learn more about the deaths of
